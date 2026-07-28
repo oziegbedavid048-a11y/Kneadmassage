@@ -2217,64 +2217,239 @@ html, body {
 
       </div>
 
-      <!-- SIDEBAR -->
-      <aside class="booking-sidebar">
-
-        <!-- Spa Image -->
-        <div class="sidebar-image-card">
-          <img src="../wp-content/uploads/2024/05/knead-booking-side.png" alt="Knead Hushed Massage Spa">
-        </div>
-
-        <!-- Contact Info -->
-        <div class="sidebar-info-card">
-          <h3 class="sidebar-section-heading"><i class="fas fa-headset"></i> Contact Us</h3>
-          <div class="contact-list">
-            <div class="contact-item">
-              <div class="contact-item-icon"><i class="fas fa-phone"></i></div>
-              <div class="contact-item-text">
-                <div class="contact-item-label">Main Phone</div>
-                <div class="contact-item-value"><a href="tel:+13105550199">+1 (310) 555-0199</a></div>
-              </div>
-            </div>
-            <div class="contact-item">
-              <div class="contact-item-icon"><i class="fas fa-phone"></i></div>
-              <div class="contact-item-text">
-                <div class="contact-item-label">Direct Line</div>
-                <div class="contact-item-value"><a href="tel:+18005550188">+1 (800) 555-0188</a></div>
-              </div>
-            </div>
-            <div class="contact-item">
-              <div class="contact-item-icon"><i class="fas fa-envelope"></i></div>
-              <div class="contact-item-text">
-                <div class="contact-item-label">Email</div>
-                <div class="contact-item-value"><a href="mailto:hello@kneadhushedmassage.com">hello@kneadhushedmassage.com</a></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Working Hours -->
-        <div class="sidebar-hours-card">
-          <div class="sidebar-hours-heading"><i class="fas fa-clock"></i> Opening Hours</div>
-          <div class="hours-list">
-            <div class="hours-row">
-              <span class="hours-day">Monday – Friday</span>
-              <span class="hours-time">9:00 AM – 7:00 PM</span>
-            </div>
-            <div class="hours-row">
-              <span class="hours-day">Saturday</span>
-              <span class="hours-time">9:00 AM – 8:00 PM</span>
-            </div>
-            <div class="hours-row">
-              <span class="hours-day">Sunday</span>
-              <span class="hours-time">1:00 PM – 8:00 PM</span>
-            </div>
-          </div>
-        </div>
-
-      </aside>
     </div>
   </section>
+
+  <!-- STYLES & JS FOR REDESIGNED BOOKING UI -->
+  <style id="knead-redesigned-booking-ui-css">
+    /* 2-COLUMN BOOKING GRID */
+    .booking-grid-wrapper {
+      display: grid !important;
+      grid-template-columns: 1fr 340px !important;
+      gap: 32px !important;
+      align-items: start !important;
+    }
+    @media (max-width: 991px) {
+      .booking-grid-wrapper {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* HAPPY ENDING ADD-ON BOX */
+    .happy-ending-card-box {
+      margin: 20px 0 28px 0 !important;
+      background: #fafaf6 !important;
+      border: 2px solid #8A9A5B !important;
+      border-radius: 14px !important;
+      padding: 16px 20px !important;
+      transition: all 0.3s ease !important;
+      box-shadow: 0 4px 16px rgba(138,154,91,0.12) !important;
+    }
+    .happy-ending-card-box:hover {
+      background: #f4f6ec !important;
+      border-color: #728247 !important;
+    }
+    .happy-ending-label {
+      display: flex !important;
+      align-items: center !important;
+      gap: 16px !important;
+      cursor: pointer !important;
+      margin: 0 !important;
+      width: 100% !important;
+    }
+    .happy-ending-check-left input[type="checkbox"] {
+      width: 24px !important;
+      height: 24px !important;
+      cursor: pointer !important;
+      accent-color: #8A9A5B !important;
+    }
+    .happy-ending-content {
+      flex: 1 !important;
+    }
+    .happy-ending-top-row {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 10px !important;
+      margin-bottom: 4px !important;
+    }
+    .happy-ending-tag {
+      background: #8A9A5B !important;
+      color: #ffffff !important;
+      font-size: 0.68rem !important;
+      font-weight: 800 !important;
+      padding: 3px 8px !important;
+      border-radius: 20px !important;
+      letter-spacing: 0.05em !important;
+      text-transform: uppercase !important;
+    }
+    .happy-ending-price-badge {
+      background: #212121 !important;
+      color: #ffffff !important;
+      font-size: 0.85rem !important;
+      font-weight: 800 !important;
+      padding: 4px 10px !important;
+      border-radius: 12px !important;
+    }
+    .happy-ending-heading {
+      margin: 4px 0 2px 0 !important;
+      font-size: 1.05rem !important;
+      font-weight: 700 !important;
+      color: #1e1e1e !important;
+    }
+    .happy-ending-description {
+      margin: 0 !important;
+      font-size: 0.83rem !important;
+      color: #555555 !important;
+      line-height: 1.35 !important;
+    }
+
+    /* STICKY SUMMARY CARD SIDEBAR */
+    .summary-card-box {
+      position: sticky !important;
+      top: 100px !important;
+      background: #ffffff !important;
+      border: 1px solid #e2e6d5 !important;
+      border-radius: 18px !important;
+      padding: 24px !important;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06) !important;
+    }
+    .summary-card-header {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      padding-bottom: 14px !important;
+      border-bottom: 1px solid #eeeeee !important;
+      margin-bottom: 18px !important;
+      color: #8A9A5B !important;
+    }
+    .summary-card-header h3 {
+      margin: 0 !important;
+      font-size: 1.15rem !important;
+      font-weight: 700 !important;
+      color: #1e1e1e !important;
+    }
+    .summary-item-row {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      margin-bottom: 12px !important;
+      font-size: 0.88rem !important;
+    }
+    .summary-item-label {
+      color: #666666 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    }
+    .summary-item-label i {
+      color: #8A9A5B !important;
+    }
+    .summary-item-val {
+      font-weight: 600 !important;
+      color: #1e1e1e !important;
+      text-align: right !important;
+    }
+    .addon-highlight-row {
+      background: #f7f9f0 !important;
+      padding: 8px 10px !important;
+      border-radius: 8px !important;
+      margin: 14px 0 !important;
+    }
+    .addon-text-badge {
+      color: #728247 !important;
+      font-weight: 700 !important;
+    }
+    .summary-divider-line {
+      height: 1px !important;
+      background: #eeeeee !important;
+      margin: 16px 0 !important;
+    }
+    .summary-total-box {
+      background: #1e1e1e !important;
+      color: #ffffff !important;
+      border-radius: 12px !important;
+      padding: 16px !important;
+      text-align: center !important;
+    }
+    .total-title {
+      font-size: 0.78rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      opacity: 0.8 !important;
+      margin-bottom: 4px !important;
+    }
+    .total-price-display {
+      font-size: 1.7rem !important;
+      font-weight: 800 !important;
+      color: #8A9A5B !important;
+    }
+    .summary-guarantees {
+      margin-top: 18px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 10px !important;
+      font-size: 0.78rem !important;
+      color: #666666 !important;
+    }
+    .guarantee-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    }
+    .guarantee-row i {
+      color: #8A9A5B !important;
+    }
+  </style>
+
+  <script id="knead-live-summary-calculator-js">
+    function updateSummary() {
+      // 1. Service Name
+      var selectedSvc = document.querySelector('input[name="service"]:checked');
+      var serviceName = selectedSvc ? selectedSvc.value : 'Massage Therapy';
+      var summarySvcEl = document.getElementById('summaryService');
+      if (summarySvcEl) summarySvcEl.innerText = serviceName;
+
+      // 2. Duration & Base Price
+      var durationSelect = document.getElementById('duration');
+      var basePrice = 200;
+      var durationText = '1 hour';
+      if (durationSelect && durationSelect.selectedIndex >= 0) {
+        var opt = durationSelect.options[durationSelect.selectedIndex];
+        basePrice = parseInt(opt.getAttribute('data-price') || '200', 10);
+        durationText = opt.getAttribute('data-time') || opt.value.split('-')[0].trim();
+      }
+      var summaryDurEl = document.getElementById('summaryDuration');
+      var summaryBaseEl = document.getElementById('summaryBasePrice');
+      if (summaryDurEl) summaryDurEl.innerText = durationText;
+      if (summaryBaseEl) summaryBaseEl.innerText = '$' + basePrice.toFixed(2);
+
+      // 3. Happy Ending Add-On
+      var happyEndingCheck = document.getElementById('happyEndingCheck');
+      var isHappyEnding = happyEndingCheck ? happyEndingCheck.checked : false;
+      var addonPrice = isHappyEnding ? 150 : 0;
+      
+      var summaryAddonVal = document.getElementById('summaryAddonVal');
+      if (summaryAddonVal) {
+        if (isHappyEnding) {
+          summaryAddonVal.innerText = 'Yes (+$150.00)';
+          summaryAddonVal.style.color = '#8A9A5B';
+        } else {
+          summaryAddonVal.innerText = 'No ($0.00)';
+          summaryAddonVal.style.color = '#777777';
+        }
+      }
+
+      // 4. Total Amount
+      var totalAmount = basePrice + addonPrice;
+      var summaryTotalEl = document.getElementById('summaryTotalAmount');
+      if (summaryTotalEl) summaryTotalEl.innerText = '$' + totalAmount.toFixed(2);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      updateSummary();
+    });
+  </script>
 
   <!-- WHY CHOOSE US -->
   <section class="why-section">
