@@ -4,11 +4,11 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load environment variables from .env
+# Load environment variables from .env if python-dotenv is present
 try:
-    from dotenv import load_dotenv
-    load_dotenv(BASE_DIR / '.env')
-except ImportError:
+    _dotenv = __import__('dotenv')
+    _dotenv.load_dotenv(BASE_DIR / '.env')
+except Exception:
     pass
 
 # SECURITY WARNING: keep the secret key used in production secret!
