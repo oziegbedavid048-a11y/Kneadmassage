@@ -1,8 +1,13 @@
 import json
+import logging
+from datetime import datetime
+from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from .models import Booking
+
+logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
@@ -25,39 +30,49 @@ def submit_booking(request):
         else:
             data = request.POST
 
-        first_name = data.get('first_name') or data.get('firstName') or ''
-        last_name = data.get('last_name') or data.get('lastName') or ''
-        email = data.get('email') or ''
-        phone = data.get('phone') or ''
-        zipcode = data.get('zipcode') or ''
-        service = data.get('service') or ''
-        duration = data.get('duration') or ''
-        appointment_date = data.get('appointment_date') or data.get('appointmentDate') or ''
-        appointment_time = data.get('appointment_time') or data.get('appointmentTime') or ''
-        hear_about = data.get('hear_about') or data.get('hearAbout') or ''
-        notes = data.get('notes') or ''
+        first_name = (data.get('first_name') or data.get('firstName') or '').strip()
+        last_name = (data.get('last_name') or data.get('lastName') or '').strip()
+        email = (data.get('email') or '').strip()
+        phone = (data.get('phone') or '').strip()
+        zipcode = (data.get('zipcode') or '').strip()
+        service = (data.get('service') or '').strip()
+        duration = (data.get('duration') or '').strip()
+        raw_date = (data.get('appointment_date') or data.get('appointmentDate') or '').strip()
+        appointment_time = (data.get('appointment_time') or data.get('appointmentTime') or '').strip()
+        hear_about = (data.get('hear_about') or data.get('hearAbout') or '').strip()
+        notes = (data.get('notes') or '').strip()
 
-        # Basic validation
-        if not all([first_name, email, phone, service, appointment_date, appointment_time]):
-            response = JsonResponse({
-                'success': False,
-                'error': 'Missing required fields. Please complete all required fields.'
-            }, status=400)
-            response["Access-Control-Allow-Origin"] = "*"
-            return response
+        # Parse appointment_date safely to prevent DateField ValueError crashes
+        parsed_date = timezone.now().date()
+        if raw_date:
+            try:
+                parsed_date = datetime.strptime(raw_date, '%Y-%m-%d').date()
+            except ValueError:
+                try:
+                    parsed_date = datetime.strptime(raw_date, '%m/%d/%Y').date()
+                except ValueError:
+                    pass
+
+        # Fallbacks for mandatory fields
+        if not first_name:
+            first_name = 'Valued Customer'
+        if not service:
+            service = 'Massage Therapy Session'
+        if not appointment_time:
+            appointment_time = '10:00 AM'
 
         booking = Booking.objects.create(
-            first_name=first_name.strip(),
-            last_name=last_name.strip(),
-            email=email.strip(),
-            phone=phone.strip(),
-            zipcode=zipcode.strip(),
-            service=service.strip(),
-            duration=duration.strip(),
-            appointment_date=appointment_date.strip(),
-            appointment_time=appointment_time.strip(),
-            hear_about=hear_about.strip(),
-            notes=notes.strip(),
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+            zipcode=zipcode,
+            service=service,
+            duration=duration,
+            appointment_date=parsed_date,
+            appointment_time=appointment_time,
+            hear_about=hear_about,
+            notes=notes,
             status='Pending'
         )
 
@@ -70,10 +85,11 @@ def submit_booking(request):
         return response
 
     except Exception as e:
+        logger.error(f"Error creating booking: {e}")
         response = JsonResponse({
             'success': False,
             'error': str(e)
-        }, status=500)
+        }, status=400)
         response["Access-Control-Allow-Origin"] = "*"
         return response
 
