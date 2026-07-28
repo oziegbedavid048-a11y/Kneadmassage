@@ -1791,14 +1791,33 @@ html, body {
     .form-group.full {
       width: 100% !important;
     }
-    .form-control, select.form-control, textarea.form-control {
+    .form-control, select.form-control, select, textarea.form-control {
       width: 100% !important;
       max-width: 100% !important;
       box-sizing: border-box !important;
-      font-size: 16px !important; /* Prevents mobile safari auto-zoom */
-      padding: 14px 14px !important;
-      border-radius: 10px !important;
+      font-size: 15px !important;
+      height: 52px !important;
+      min-height: 52px !important;
+      max-height: none !important;
       line-height: 1.4 !important;
+      padding: 12px 34px 12px 14px !important;
+      border-radius: 10px !important;
+      background-color: #ffffff !important;
+      color: #1e1e1e !important;
+      display: block !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      appearance: none !important;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23555555' viewBox='0 0 16 16'><path d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/></svg>") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 14px center !important;
+    }
+    select.form-control option, select option {
+      font-size: 14px !important;
+      padding: 10px !important;
+      line-height: 1.4 !important;
+      color: #1e1e1e !important;
+      background: #ffffff !important;
     }
     .step-nav-buttons {
       display: flex !important;
@@ -2055,12 +2074,8 @@ html, body {
                     <input type="checkbox" id="happyEndingCheck" name="happyEndingCheck" onchange="updateSummary()">
                   </div>
                   <div class="happy-ending-content">
-                    <div class="happy-ending-top-row">
-                      <span class="happy-ending-tag">✨ POPULAR EXCLUSIVE ADD-ON</span>
-                      <span class="happy-ending-price-badge">+$150.00</span>
-                    </div>
                     <h4 class="happy-ending-heading">Add Happy Ending Service (+ $150)</h4>
-                    <p class="happy-ending-description">Tick this box to add complete physical relaxation & ultimate satisfaction to your session.</p>
+                    <p class="happy-ending-description">Tick this box if you would like to include a Happy Ending service (+ $150) with your massage session.</p>
                   </div>
                 </label>
               </div>
@@ -2754,16 +2769,7 @@ html, body {
 
     function validateStep(step) {
       if (step === 1) {
-        const fields = ['firstName', 'lastName', 'email', 'phone', 'zipcode'];
-        for (const id of fields) {
-          const el = document.getElementById(id);
-          if (el && !el.checkValidity()) {
-            el.reportValidity();
-            return false;
-          }
-        }
-      } else if (step === 2) {
-        // Validate service radio is selected
+        // Step 1: Validate Service & Duration
         const services = document.getElementsByName('service');
         let selected = false;
         for (const s of services) {
@@ -2776,12 +2782,37 @@ html, body {
           alert('Please select a massage service to continue.');
           return false;
         }
-        // Validate duration select
         const duration = document.getElementById('duration');
         if (duration && !duration.checkValidity()) {
           duration.reportValidity();
           return false;
         }
+        // Note: Happy Ending check is 100% optional!
+        return true;
+      } else if (step === 2) {
+        // Step 2: Validate Date & Time Slot
+        const dateEl = document.getElementById('appointmentDate');
+        const timeEl = document.getElementById('appointmentTime');
+        if (dateEl && !dateEl.checkValidity()) {
+          dateEl.reportValidity();
+          return false;
+        }
+        if (timeEl && !timeEl.checkValidity()) {
+          timeEl.reportValidity();
+          return false;
+        }
+        return true;
+      } else if (step === 3) {
+        // Step 3: Validate Contact Information
+        const fields = ['firstName', 'lastName', 'email', 'phone', 'zipcode'];
+        for (const id of fields) {
+          const el = document.getElementById(id);
+          if (el && !el.checkValidity()) {
+            el.reportValidity();
+            return false;
+          }
+        }
+        return true;
       }
       return true;
     }
