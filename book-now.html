@@ -2909,6 +2909,28 @@ html, body {
       }
     }
 
+    function formatErrorReason(errVal) {
+      if (!errVal) return '';
+      if (typeof errVal === 'string') return errVal;
+      if (typeof errVal === 'object') {
+        if (errVal.message) return errVal.message;
+        try {
+          const pairs = [];
+          for (const k in errVal) {
+            if (Object.prototype.hasOwnProperty.call(errVal, k)) {
+              const val = Array.isArray(errVal[k]) ? errVal[k].join(', ') : errVal[k];
+              pairs.push(k + ': ' + val);
+            }
+          }
+          if (pairs.length > 0) return pairs.join(' | ');
+          return JSON.stringify(errVal);
+        } catch (e) {
+          return String(errVal);
+        }
+      }
+      return String(errVal);
+    }
+
     async function handleBooking(e) {
       e.preventDefault();
       const form = document.getElementById('bookingForm');
@@ -3031,10 +3053,12 @@ html, body {
             isSuccess = true;
             break;
           } else {
-            lastErrorReason = data.error || ('HTTP ' + response.status + ': Server failed to save booking to database.');
+            const parsedErr = formatErrorReason(data.error);
+            lastErrorReason = parsedErr || ('HTTP ' + response.status + ': Server failed to save booking to database.');
           }
         } catch (err) {
-          lastErrorReason = 'Unable to connect to backend API server at ' + apiUrl + '. Check backend status or Render deployment.';
+          const parsedErr = formatErrorReason(err);
+          lastErrorReason = 'Unable to connect to backend API server at ' + apiUrl + ' (' + (parsedErr || 'Network Error') + '). Check backend status or Render deployment.';
           console.warn('Endpoint attempt failed:', apiUrl, err);
         }
       }
