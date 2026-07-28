@@ -1919,240 +1919,554 @@ html, body {
   <section class="booking-section">
     <div class="booking-container">
 
-      <!-- BOOKING FORM CARD -->
-      <div class="booking-form-card">
-        <p class="form-section-label">Reserve Your Session</p>
-        <h2 class="form-section-title">Book an Appointment</h2>
-        <p class="form-section-desc">Complete the form below and we'll confirm your booking within 2 hours. Fields marked with <span style="color:var(--olive);font-weight:700;">*</span> are required.</p>
-        <div class="form-divider"></div>
+      <!-- 2-COLUMN BOOKING GRID -->
+      <div class="booking-grid-wrapper">
 
-        <form id="bookingForm" onsubmit="handleBooking(event)" novalidate>
+        <!-- LEFT COLUMN: FORM CARD -->
+        <div class="booking-form-card">
+          <p class="form-section-label">Reserve Your Session</p>
+          <h2 class="form-section-title">Book an Appointment</h2>
+          <p class="form-section-desc">Select your service, customization, date and time below. We'll confirm your reservation within 2 hours.</p>
+          <div class="form-divider"></div>
 
-          <!-- PROGRESS STEPS INDICATOR -->
-          <div class="booking-steps-indicator">
-            <div class="step-badge active" id="step-badge-1"><span class="step-num">1</span> <span class="step-title">Information</span></div>
-            <div class="step-line" id="step-line-1"></div>
-            <div class="step-badge" id="step-badge-2"><span class="step-num">2</span> <span class="step-title">Service</span></div>
-            <div class="step-line" id="step-line-2"></div>
-            <div class="step-badge" id="step-badge-3"><span class="step-num">3</span> <span class="step-title">Details</span></div>
-          </div>
+          <form id="bookingForm" onsubmit="handleBooking(event)" novalidate>
 
-          <!-- STEP 1: INFORMATION -->
-          <div class="booking-step-pane active" id="step-pane-1">
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="firstName">First Name <span class="required">*</span></label>
-                <input id="firstName" name="firstName" type="text" class="form-control" placeholder="e.g. Ashley" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="lastName">Last Name <span class="required">*</span></label>
-                <input id="lastName" name="lastName" type="text" class="form-control" placeholder="e.g. Taylor" required>
-              </div>
+            <!-- PROGRESS STEPS INDICATOR -->
+            <div class="booking-steps-indicator">
+              <div class="step-badge active" id="step-badge-1"><span class="step-num">1</span> <span class="step-title">Service & Add-On</span></div>
+              <div class="step-line" id="step-line-1"></div>
+              <div class="step-badge" id="step-badge-2"><span class="step-num">2</span> <span class="step-title">Date & Time</span></div>
+              <div class="step-line" id="step-line-2"></div>
+              <div class="step-badge" id="step-badge-3"><span class="step-num">3</span> <span class="step-title">Your Info</span></div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="email">Email Address <span class="required">*</span></label>
-                <input id="email" name="email" type="email" class="form-control" placeholder="e.g. ashley@example.com" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="phone">Phone Number <span class="required">*</span></label>
-                <input id="phone" name="phone" type="tel" class="form-control" placeholder="e.g. (555) 234-5678" required>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group full">
-                <label class="form-label" for="zipcode">Zip Code / Postal Code <span class="required">*</span></label>
-                <input id="zipcode" name="zipcode" type="text" class="form-control" placeholder="e.g. 90210" required>
-              </div>
-            </div>
-
-            <div class="step-nav-buttons">
-              <button type="button" class="btn-book" onclick="nextStep(2)">Continue <i class="fas fa-arrow-right"></i></button>
-            </div>
-          </div>
-
-          <!-- STEP 2: SERVICE & DURATION -->
-          <div class="booking-step-pane" id="step-pane-2">
-            <div class="form-group" style="margin-bottom:24px;">
-              <label class="form-label">Select Service <span class="required">*</span></label>
+            <!-- STEP 1: SERVICE, DURATION & HAPPY ENDING ADD-ON -->
+            <div class="booking-step-pane active" id="step-pane-1">
               
-              <div class="services-grid">
-                <div class="service-card">
-                  <input type="radio" name="service" id="svc_nuru" value="Nuru Massage" required>
-                  <label class="service-card-label" for="svc_nuru">
-                    <span class="service-icon"><i class="fas fa-water"></i></span>
-                    <span class="service-name">Nuru Massage</span>
-                  </label>
-                </div>
-                <div class="service-card">
-                  <input type="radio" name="service" id="svc_swedish" value="Swedish Massage">
-                  <label class="service-card-label" for="svc_swedish">
-                    <span class="service-icon"><i class="fas fa-hands"></i></span>
-                    <span class="service-name">Swedish Massage</span>
-                  </label>
-                </div>
-                <div class="service-card">
-                  <input type="radio" name="service" id="svc_deeptissue" value="Deep Tissue Massage">
-                  <label class="service-card-label" for="svc_deeptissue">
-                    <span class="service-icon"><i class="fas fa-hand-sparkles"></i></span>
-                    <span class="service-name">Deep Tissue</span>
-                  </label>
-                </div>
-                <div class="service-card">
-                  <input type="radio" name="service" id="svc_lingam" value="Lingam Massage">
-                  <label class="service-card-label" for="svc_lingam">
-                    <span class="service-icon"><i class="fas fa-spa"></i></span>
-                    <span class="service-name">Lingam Massage</span>
-                  </label>
-                </div>
-                <div class="service-card">
-                  <input type="radio" name="service" id="svc_lymphatic" value="Lymphatic Drainage">
-                  <label class="service-card-label" for="svc_lymphatic">
-                    <span class="service-icon"><i class="fas fa-leaf"></i></span>
-                    <span class="service-name">Lymphatic Drainage</span>
-                  </label>
-                </div>
-                <div class="service-card">
-                  <input type="radio" name="service" id="svc_thai" value="Thai Massage">
-                  <label class="service-card-label" for="svc_thai">
-                    <span class="service-icon"><i class="fas fa-user-ninja"></i></span>
-                    <span class="service-name">Thai Massage</span>
-                  </label>
-                </div>
-                <div class="service-card">
-                  <input type="radio" name="service" id="svc_tantric" value="Tantric Massage">
-                  <label class="service-card-label" for="svc_tantric">
-                    <span class="service-icon"><i class="fas fa-heart"></i></span>
-                    <span class="service-name">Tantric Massage</span>
-                  </label>
-                </div>
-                <div class="service-card">
-                  <input type="radio" name="service" id="svc_ashiatsu" value="Ashiatsu Massage">
-                  <label class="service-card-label" for="svc_ashiatsu">
-                    <span class="service-icon"><i class="fas fa-shoe-prints"></i></span>
-                    <span class="service-name">Ashiatsu Massage</span>
-                  </label>
-                </div>
-                <div class="service-card">
-                  <input type="radio" name="service" id="svc_jacuzzi" value="Jacuzzi Treatment">
-                  <label class="service-card-label" for="svc_jacuzzi">
-                    <span class="service-icon"><i class="fas fa-hot-tub-person"></i></span>
-                    <span class="service-name">Jacuzzi</span>
-                  </label>
-                </div>
-                <div class="service-card">
-                  <input type="radio" name="service" id="svc_happyending" value="Massage & Happy Ending">
-                  <label class="service-card-label" for="svc_happyending">
-                    <span class="service-icon"><i class="fas fa-wand-magic-sparkles"></i></span>
-                    <span class="service-name">Massage & Happy Ending</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group full">
-                <label class="form-label" for="duration">Select Duration & Price <span class="required">*</span></label>
-                <select id="duration" name="duration" class="form-control" required>
-                  <option value="" disabled selected>Choose duration & price</option>
-                  <option value="30 mins - $150">30 minutes - $150</option>
-                  <option value="1 hour - $200">1 hour - $200</option>
-                  <option value="1 hour 30 mins - $250">1 hour 30 minutes - $250</option>
-                  <option value="2 hours - $300">2 hours - $300</option>
-                  <option value="2 hours 30 mins - $350">2 hours 30 minutes - $350</option>
-                  <option value="3 hours - $400">3 hours - $400</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="step-nav-buttons">
-              <button type="button" class="btn-book btn-secondary" onclick="prevStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
-              <button type="button" class="btn-book" onclick="nextStep(3)">Continue <i class="fas fa-arrow-right"></i></button>
-            </div>
-          </div>
-
-          <!-- STEP 3: DETAILS & TIME -->
-          <div class="booking-step-pane" id="step-pane-3">
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label" for="appointmentDate">Preferred Date <span class="required">*</span></label>
-                <div class="datetime-input-wrapper">
-                  <i class="fas fa-calendar-alt"></i>
-                  <input id="appointmentDate" name="appointmentDate" type="date" class="form-control" required>
+              <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label">1. Select Your Service <span class="required">*</span></label>
+                <div class="services-grid">
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_nuru" value="Nuru Massage" data-name="Nuru Massage" checked onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_nuru">
+                      <span class="service-icon"><i class="fas fa-water"></i></span>
+                      <span class="service-name">Nuru Massage</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_swedish" value="Swedish Massage" data-name="Swedish Massage" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_swedish">
+                      <span class="service-icon"><i class="fas fa-hands"></i></span>
+                      <span class="service-name">Swedish Massage</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_deeptissue" value="Deep Tissue Massage" data-name="Deep Tissue Massage" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_deeptissue">
+                      <span class="service-icon"><i class="fas fa-hand-sparkles"></i></span>
+                      <span class="service-name">Deep Tissue</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_lingam" value="Lingam Massage" data-name="Lingam Massage" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_lingam">
+                      <span class="service-icon"><i class="fas fa-spa"></i></span>
+                      <span class="service-name">Lingam Massage</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_lymphatic" value="Lymphatic Drainage" data-name="Lymphatic Drainage" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_lymphatic">
+                      <span class="service-icon"><i class="fas fa-leaf"></i></span>
+                      <span class="service-name">Lymphatic Drainage</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_thai" value="Thai Massage" data-name="Thai Massage" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_thai">
+                      <span class="service-icon"><i class="fas fa-user-ninja"></i></span>
+                      <span class="service-name">Thai Massage</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_tantric" value="Tantric Massage" data-name="Tantric Massage" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_tantric">
+                      <span class="service-icon"><i class="fas fa-heart"></i></span>
+                      <span class="service-name">Tantric Massage</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_ashiatsu" value="Ashiatsu Massage" data-name="Ashiatsu Massage" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_ashiatsu">
+                      <span class="service-icon"><i class="fas fa-shoe-prints"></i></span>
+                      <span class="service-name">Ashiatsu Massage</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_jacuzzi" value="Jacuzzi Treatment" data-name="Jacuzzi Treatment" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_jacuzzi">
+                      <span class="service-icon"><i class="fas fa-hot-tub-person"></i></span>
+                      <span class="service-name">Jacuzzi</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_facials" value="Facials Treatment" data-name="Facials Treatment" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_facials">
+                      <span class="service-icon"><i class="fas fa-smile"></i></span>
+                      <span class="service-name">Facials</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_waxing" value="Waxing Service" data-name="Waxing Service" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_waxing">
+                      <span class="service-icon"><i class="fas fa-feather"></i></span>
+                      <span class="service-name">Waxing</span>
+                    </label>
+                  </div>
+                  <div class="service-card">
+                    <input type="radio" name="service" id="svc_bodypolish" value="Body Polish" data-name="Body Polish" onchange="updateSummary()">
+                    <label class="service-card-label" for="svc_bodypolish">
+                      <span class="service-icon"><i class="fas fa-gem"></i></span>
+                      <span class="service-name">Body Polish</span>
+                    </label>
+                  </div>
                 </div>
               </div>
-              <div class="form-group">
-                <label class="form-label" for="appointmentTime">Preferred Time <span class="required">*</span></label>
-                <div class="datetime-input-wrapper">
-                  <i class="fas fa-clock"></i>
-                  <select id="appointmentTime" name="appointmentTime" class="form-control" required>
-                    <option value="" disabled selected>Select a time slot</option>
-                    <option value="09:00">09:00 AM</option>
-                    <option value="10:00">10:00 AM</option>
-                    <option value="11:00">11:00 AM</option>
-                    <option value="12:00">12:00 PM</option>
-                    <option value="13:00">01:00 PM</option>
-                    <option value="14:00">02:00 PM</option>
-                    <option value="15:00">03:00 PM</option>
-                    <option value="16:00">04:00 PM</option>
-                    <option value="17:00">05:00 PM</option>
-                    <option value="18:00">06:00 PM</option>
-                    <option value="19:00">07:00 PM</option>
+
+              <!-- DURATION SELECTION -->
+              <div class="form-row" style="margin-bottom:24px;">
+                <div class="form-group full">
+                  <label class="form-label" for="duration">2. Choose Session Duration & Base Price <span class="required">*</span></label>
+                  <select id="duration" name="duration" class="form-control" onchange="updateSummary()" required>
+                    <option value="30 mins - $150" data-price="150" data-time="30 minutes">30 minutes — $150.00</option>
+                    <option value="1 hour - $200" data-price="200" data-time="1 hour" selected>1 hour — $200.00 (Recommended)</option>
+                    <option value="1 hour 30 mins - $250" data-price="250" data-time="1 hour 30 minutes">1 hour 30 minutes — $250.00</option>
+                    <option value="2 hours - $300" data-price="300" data-time="2 hours">2 hours — $300.00</option>
+                    <option value="2 hours 30 mins - $350" data-price="350" data-time="2 hours 30 minutes">2 hours 30 minutes — $350.00</option>
+                    <option value="3 hours - $400" data-price="400" data-time="3 hours">3 hours — $400.00</option>
                   </select>
                 </div>
               </div>
+
+              <!-- HAPPY ENDING ADD-ON BOX -->
+              <div class="happy-ending-card-box" id="happyEndingCardBox">
+                <label class="happy-ending-label" for="happyEndingCheck">
+                  <div class="happy-ending-check-left">
+                    <input type="checkbox" id="happyEndingCheck" name="happyEndingCheck" onchange="updateSummary()">
+                  </div>
+                  <div class="happy-ending-content">
+                    <div class="happy-ending-top-row">
+                      <span class="happy-ending-tag">✨ POPULAR EXCLUSIVE ADD-ON</span>
+                      <span class="happy-ending-price-badge">+$150.00</span>
+                    </div>
+                    <h4 class="happy-ending-heading">Add Happy Ending Service (+ $150)</h4>
+                    <p class="happy-ending-description">Tick this box to add complete physical relaxation & ultimate satisfaction to your session.</p>
+                  </div>
+                </label>
+              </div>
+
+              <div class="step-nav-buttons">
+                <button type="button" class="btn-book" onclick="nextStep(2)">Continue to Date & Time <i class="fas fa-arrow-right"></i></button>
+              </div>
+
             </div>
 
-            <div class="form-row">
-              <div class="form-group full">
-                <label class="form-label" for="hearAbout">How Did You Hear About Us?</label>
-                <select id="hearAbout" name="hearAbout" class="form-control">
-                  <option value="" disabled selected>Please select</option>
-                  <option>Instagram</option>
-                  <option>Facebook</option>
-                  <option>Google Search</option>
-                  <option>Friend / Family Referral</option>
-                  <option>Walk-In</option>
-                  <option>Other</option>
-                </select>
+            <!-- STEP 2: DATE & TIME -->
+            <div class="booking-step-pane" id="step-pane-2">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="appointmentDate">Preferred Date <span class="required">*</span></label>
+                  <div class="datetime-input-wrapper">
+                    <i class="fas fa-calendar-alt"></i>
+                    <input id="appointmentDate" name="appointmentDate" type="date" class="form-control" onchange="updateSummary()" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="appointmentTime">Preferred Time Slot <span class="required">*</span></label>
+                  <div class="datetime-input-wrapper">
+                    <i class="fas fa-clock"></i>
+                    <select id="appointmentTime" name="appointmentTime" class="form-control" onchange="updateSummary()" required>
+                      <option value="" disabled selected>Select time slot</option>
+                      <option value="09:00 AM">09:00 AM</option>
+                      <option value="10:00 AM">10:00 AM</option>
+                      <option value="11:00 AM">11:00 AM</option>
+                      <option value="12:00 PM">12:00 PM</option>
+                      <option value="01:00 PM">01:00 PM</option>
+                      <option value="02:00 PM">02:00 PM</option>
+                      <option value="03:00 PM">03:00 PM</option>
+                      <option value="04:00 PM">04:00 PM</option>
+                      <option value="05:00 PM">05:00 PM</option>
+                      <option value="06:00 PM">06:00 PM</option>
+                      <option value="07:00 PM">07:00 PM</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group full">
+                  <label class="form-label" for="hearAbout">How Did You Hear About Us?</label>
+                  <select id="hearAbout" name="hearAbout" class="form-control">
+                    <option value="" disabled selected>Please select</option>
+                    <option>Instagram</option>
+                    <option>Facebook</option>
+                    <option>Google Search</option>
+                    <option>Friend / Family Referral</option>
+                    <option>Walk-In</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom:24px;">
+                <label class="form-label" for="notes">Special Requests / Health Notes</label>
+                <textarea id="notes" name="notes" class="form-control" placeholder="Any allergies, areas to focus on, or special preferences..."></textarea>
+              </div>
+
+              <div class="step-nav-buttons">
+                <button type="button" class="btn-book btn-secondary" onclick="prevStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+                <button type="button" class="btn-book" onclick="nextStep(3)">Continue to Your Info <i class="fas fa-arrow-right"></i></button>
               </div>
             </div>
 
-            <div class="form-group" style="margin-bottom:24px;">
-              <label class="form-label" for="notes">Special Requests / Health Notes</label>
-              <textarea id="notes" name="notes" class="form-control" placeholder="Any allergies, injuries, areas to avoid, or personal preferences we should know..."></textarea>
+            <!-- STEP 3: CUSTOMER INFORMATION -->
+            <div class="booking-step-pane" id="step-pane-3">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="firstName">First Name <span class="required">*</span></label>
+                  <input id="firstName" name="firstName" type="text" class="form-control" placeholder="e.g. Ashley" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="lastName">Last Name <span class="required">*</span></label>
+                  <input id="lastName" name="lastName" type="text" class="form-control" placeholder="e.g. Taylor" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="email">Email Address <span class="required">*</span></label>
+                  <input id="email" name="email" type="email" class="form-control" placeholder="e.g. ashley@example.com" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="phone">Phone Number <span class="required">*</span></label>
+                  <input id="phone" name="phone" type="tel" class="form-control" placeholder="e.g. (555) 234-5678" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group full">
+                  <label class="form-label" for="zipcode">Zip Code / Postal Code <span class="required">*</span></label>
+                  <input id="zipcode" name="zipcode" type="text" class="form-control" placeholder="e.g. 90210" required>
+                </div>
+              </div>
+
+              <div class="consent-row">
+                <input type="checkbox" id="consent" name="consent" required>
+                <label for="consent" class="consent-text">
+                  I agree to the Terms & Conditions and Privacy Policy. I consent to Knead Hushed Massage collecting and using my information to process this booking.
+                </label>
+              </div>
+
+              <div class="step-nav-buttons">
+                <button type="button" class="btn-book btn-secondary" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+                <button type="submit" class="btn-book" id="bookBtn">
+                  <i class="fas fa-calendar-check"></i>
+                  Confirm Reservation
+                </button>
+              </div>
             </div>
 
-            <div class="consent-row">
-              <input type="checkbox" id="consent" name="consent" required>
-              <label for="consent" class="consent-text">
-                I agree to the Terms & Conditions and Privacy Policy. I consent to Knead Hushed Massage collecting and using my information to process this booking.
-              </label>
+          </form>
+
+          <!-- SUCCESS STATE -->
+          <div class="booking-success" id="bookingSuccess" style="display:none;">
+            <div class="success-icon"><i class="fas fa-circle-check"></i></div>
+            <h3 class="success-title">You're All Set!</h3>
+            <p class="success-text">Your appointment request has been received and saved to our booking database. We'll send a confirmation to your email within 2 hours. We look forward to providing your wellness experience!<br><br><strong>Knead Hushed Massage — Your Wellness Journey Begins Here.</strong></p>
+            <a href="index.html" class="btn-book" style="display:inline-block;margin-top:24px;width:auto;padding:12px 32px;text-decoration:none;">Return Home</a>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: STICKY ORDER SUMMARY BOX -->
+        <aside class="booking-summary-sidebar">
+          <div class="summary-card-box">
+            <div class="summary-card-header">
+              <i class="fas fa-receipt"></i>
+              <h3>Booking Summary</h3>
+            </div>
+            
+            <div class="summary-card-body">
+              <div class="summary-item-row">
+                <span class="summary-item-label"><i class="fas fa-spa"></i> Service</span>
+                <span class="summary-item-val" id="summaryService">Nuru Massage</span>
+              </div>
+              
+              <div class="summary-item-row">
+                <span class="summary-item-label"><i class="fas fa-hourglass-half"></i> Duration</span>
+                <span class="summary-item-val" id="summaryDuration">1 hour</span>
+              </div>
+
+              <div class="summary-item-row">
+                <span class="summary-item-label"><i class="fas fa-tag"></i> Base Price</span>
+                <span class="summary-item-val" id="summaryBasePrice">$200.00</span>
+              </div>
+
+              <div class="summary-item-row addon-highlight-row" id="summaryAddonRow">
+                <span class="summary-item-label"><i class="fas fa-sparkles"></i> Happy Ending Add-On</span>
+                <span class="summary-item-val addon-text-badge" id="summaryAddonVal">No ($0.00)</span>
+              </div>
+
+              <div class="summary-divider-line"></div>
+
+              <div class="summary-total-box">
+                <div class="total-title">Total Estimated Price</div>
+                <div class="total-price-display" id="summaryTotalAmount">$200.00</div>
+              </div>
             </div>
 
-            <div class="step-nav-buttons">
-              <button type="button" class="btn-book btn-secondary" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
-              <button type="submit" class="btn-book" id="bookBtn">
-                <i class="fas fa-calendar-check"></i>
-                Confirm My Appointment
-              </button>
+            <div class="summary-guarantees">
+              <div class="guarantee-row"><i class="fas fa-user-shield"></i> <span>100% Private & Discreet</span></div>
+              <div class="guarantee-row"><i class="fas fa-check-double"></i> <span>Instant Confirmation</span></div>
+              <div class="guarantee-row"><i class="fas fa-award"></i> <span>Certified Professional Therapists</span></div>
             </div>
           </div>
+        </aside>
 
-        </form>
-
-        <!-- SUCCESS STATE -->
-        <div class="booking-success" id="bookingSuccess">
-          <div class="success-icon"><i class="fas fa-circle-check"></i></div>
-          <h3 class="success-title">You're All Set!</h3>
-          <p class="success-text">Your appointment request has been received. We'll send a confirmation to your email within 2 hours. We can't wait to see you!<br><br><strong>Knead Hushed Massage — Your Wellness Journey Begins Here.</strong></p>
-          <a href="index.html" style="display:inline-block;margin-top:24px;padding:12px 28px;background:var(--olive);color:#fff;border-radius:25px;text-decoration:none;font-weight:600;font-size:0.9rem;">Return Home</a>
-        </div>
       </div>
+
     </div>
   </section>
+
+  <!-- STYLES & JS FOR REDESIGNED BOOKING UI -->
+  <style id="knead-redesigned-booking-ui-css">
+    /* 2-COLUMN BOOKING GRID */
+    .booking-grid-wrapper {
+      display: grid !important;
+      grid-template-columns: 1fr 340px !important;
+      gap: 32px !important;
+      align-items: start !important;
+    }
+    @media (max-width: 991px) {
+      .booking-grid-wrapper {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* HAPPY ENDING ADD-ON BOX */
+    .happy-ending-card-box {
+      margin: 20px 0 28px 0 !important;
+      background: #fafaf6 !important;
+      border: 2px solid #8A9A5B !important;
+      border-radius: 14px !important;
+      padding: 16px 20px !important;
+      transition: all 0.3s ease !important;
+      box-shadow: 0 4px 16px rgba(138,154,91,0.12) !important;
+    }
+    .happy-ending-card-box:hover {
+      background: #f4f6ec !important;
+      border-color: #728247 !important;
+    }
+    .happy-ending-label {
+      display: flex !important;
+      align-items: center !important;
+      gap: 16px !important;
+      cursor: pointer !important;
+      margin: 0 !important;
+      width: 100% !important;
+    }
+    .happy-ending-check-left input[type="checkbox"] {
+      width: 24px !important;
+      height: 24px !important;
+      cursor: pointer !important;
+      accent-color: #8A9A5B !important;
+    }
+    .happy-ending-content {
+      flex: 1 !important;
+    }
+    .happy-ending-top-row {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 10px !important;
+      margin-bottom: 4px !important;
+    }
+    .happy-ending-tag {
+      background: #8A9A5B !important;
+      color: #ffffff !important;
+      font-size: 0.68rem !important;
+      font-weight: 800 !important;
+      padding: 3px 8px !important;
+      border-radius: 20px !important;
+      letter-spacing: 0.05em !important;
+      text-transform: uppercase !important;
+    }
+    .happy-ending-price-badge {
+      background: #212121 !important;
+      color: #ffffff !important;
+      font-size: 0.85rem !important;
+      font-weight: 800 !important;
+      padding: 4px 10px !important;
+      border-radius: 12px !important;
+    }
+    .happy-ending-heading {
+      margin: 4px 0 2px 0 !important;
+      font-size: 1.05rem !important;
+      font-weight: 700 !important;
+      color: #1e1e1e !important;
+    }
+    .happy-ending-description {
+      margin: 0 !important;
+      font-size: 0.83rem !important;
+      color: #555555 !important;
+      line-height: 1.35 !important;
+    }
+
+    /* STICKY SUMMARY CARD SIDEBAR */
+    .summary-card-box {
+      position: sticky !important;
+      top: 100px !important;
+      background: #ffffff !important;
+      border: 1px solid #e2e6d5 !important;
+      border-radius: 18px !important;
+      padding: 24px !important;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06) !important;
+    }
+    .summary-card-header {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      padding-bottom: 14px !important;
+      border-bottom: 1px solid #eeeeee !important;
+      margin-bottom: 18px !important;
+      color: #8A9A5B !important;
+    }
+    .summary-card-header h3 {
+      margin: 0 !important;
+      font-size: 1.15rem !important;
+      font-weight: 700 !important;
+      color: #1e1e1e !important;
+    }
+    .summary-item-row {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      margin-bottom: 12px !important;
+      font-size: 0.88rem !important;
+    }
+    .summary-item-label {
+      color: #666666 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    }
+    .summary-item-label i {
+      color: #8A9A5B !important;
+    }
+    .summary-item-val {
+      font-weight: 600 !important;
+      color: #1e1e1e !important;
+      text-align: right !important;
+    }
+    .addon-highlight-row {
+      background: #f7f9f0 !important;
+      padding: 8px 10px !important;
+      border-radius: 8px !important;
+      margin: 14px 0 !important;
+    }
+    .addon-text-badge {
+      color: #728247 !important;
+      font-weight: 700 !important;
+    }
+    .summary-divider-line {
+      height: 1px !important;
+      background: #eeeeee !important;
+      margin: 16px 0 !important;
+    }
+    .summary-total-box {
+      background: #1e1e1e !important;
+      color: #ffffff !important;
+      border-radius: 12px !important;
+      padding: 16px !important;
+      text-align: center !important;
+    }
+    .total-title {
+      font-size: 0.78rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      opacity: 0.8 !important;
+      margin-bottom: 4px !important;
+    }
+    .total-price-display {
+      font-size: 1.7rem !important;
+      font-weight: 800 !important;
+      color: #8A9A5B !important;
+    }
+    .summary-guarantees {
+      margin-top: 18px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 10px !important;
+      font-size: 0.78rem !important;
+      color: #666666 !important;
+    }
+    .guarantee-row {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+    }
+    .guarantee-row i {
+      color: #8A9A5B !important;
+    }
+  </style>
+
+  <script id="knead-live-summary-calculator-js">
+    function updateSummary() {
+      // 1. Service Name
+      var selectedSvc = document.querySelector('input[name="service"]:checked');
+      var serviceName = selectedSvc ? selectedSvc.value : 'Massage Therapy';
+      var summarySvcEl = document.getElementById('summaryService');
+      if (summarySvcEl) summarySvcEl.innerText = serviceName;
+
+      // 2. Duration & Base Price
+      var durationSelect = document.getElementById('duration');
+      var basePrice = 200;
+      var durationText = '1 hour';
+      if (durationSelect && durationSelect.selectedIndex >= 0) {
+        var opt = durationSelect.options[durationSelect.selectedIndex];
+        basePrice = parseInt(opt.getAttribute('data-price') || '200', 10);
+        durationText = opt.getAttribute('data-time') || opt.value.split('-')[0].trim();
+      }
+      var summaryDurEl = document.getElementById('summaryDuration');
+      var summaryBaseEl = document.getElementById('summaryBasePrice');
+      if (summaryDurEl) summaryDurEl.innerText = durationText;
+      if (summaryBaseEl) summaryBaseEl.innerText = '$' + basePrice.toFixed(2);
+
+      // 3. Happy Ending Add-On
+      var happyEndingCheck = document.getElementById('happyEndingCheck');
+      var isHappyEnding = happyEndingCheck ? happyEndingCheck.checked : false;
+      var addonPrice = isHappyEnding ? 150 : 0;
+      
+      var summaryAddonVal = document.getElementById('summaryAddonVal');
+      if (summaryAddonVal) {
+        if (isHappyEnding) {
+          summaryAddonVal.innerText = 'Yes (+$150.00)';
+          summaryAddonVal.style.color = '#8A9A5B';
+        } else {
+          summaryAddonVal.innerText = 'No ($0.00)';
+          summaryAddonVal.style.color = '#777777';
+        }
+      }
+
+      // 4. Total Amount
+      var totalAmount = basePrice + addonPrice;
+      var summaryTotalEl = document.getElementById('summaryTotalAmount');
+      if (summaryTotalEl) summaryTotalEl.innerText = '$' + totalAmount.toFixed(2);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      updateSummary();
+    });
+  </script>
 
   <!-- FOOTER -->
   <footer id="knead-custom-footer">
@@ -2571,18 +2885,40 @@ html, body {
 
       // Collect Form Data
       const selectedService = document.querySelector('input[name="service"]:checked');
+      const happyEndingCheck = document.getElementById('happyEndingCheck');
+      const isHappyEnding = happyEndingCheck ? happyEndingCheck.checked : false;
+      const durationSelect = document.getElementById('duration');
+      
+      var basePrice = 200;
+      var durationVal = durationSelect ? durationSelect.value : '1 hour';
+      if (durationSelect && durationSelect.selectedIndex >= 0) {
+        var opt = durationSelect.options[durationSelect.selectedIndex];
+        basePrice = parseInt(opt.getAttribute('data-price') || '200', 10);
+      }
+      var totalAmount = basePrice + (isHappyEnding ? 150 : 0);
+
+      var serviceString = selectedService ? selectedService.value : 'Massage Therapy';
+      if (isHappyEnding) {
+        serviceString += ' + Happy Ending (+ $150)';
+      }
+
+      var userNotes = document.getElementById('notes')?.value || '';
+      if (isHappyEnding) {
+        userNotes = (userNotes ? (userNotes + ' | ') : '') + '[ADD-ON REQUESTED: Happy Ending (+ $150)]';
+      }
+
       const payload = {
         firstName: document.getElementById('firstName')?.value || '',
         lastName: document.getElementById('lastName')?.value || '',
         email: document.getElementById('email')?.value || '',
         phone: document.getElementById('phone')?.value || '',
         zipcode: document.getElementById('zipcode')?.value || '',
-        service: selectedService ? selectedService.value : '',
-        duration: document.getElementById('duration')?.value || '',
+        service: serviceString,
+        duration: durationVal + ' (Total Price: $' + totalAmount + ')',
         appointmentDate: dateEl?.value || '',
         appointmentTime: timeEl?.value || '',
         hearAbout: document.getElementById('hearAbout')?.value || '',
-        notes: document.getElementById('notes')?.value || ''
+        notes: userNotes
       };
 
       // API Endpoint URL (Django Backend)
