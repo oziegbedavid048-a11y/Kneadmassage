@@ -88,8 +88,8 @@ def submit_booking(request):
         logger.error(f"Error creating booking: {e}")
         response = JsonResponse({
             'success': False,
-            'error': str(e)
-        }, status=400)
+            'error': f"PostgreSQL / Database Error: {str(e)}"
+        }, status=500)
         response["Access-Control-Allow-Origin"] = "*"
         return response
 

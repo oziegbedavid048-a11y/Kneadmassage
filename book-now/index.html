@@ -1953,6 +1953,15 @@ html, body {
 
           <form id="bookingForm" onsubmit="handleBooking(event)" novalidate>
 
+            <!-- ERROR ALERT BANNER -->
+            <div id="bookingErrorAlert" style="display:none; background:#FFF0F0; border:1px solid #E53935; color:#D32F2F; padding:16px; border-radius:10px; margin-bottom:20px; font-size:0.9rem;">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+                <i class="fas fa-exclamation-triangle" style="font-size:1.2rem; color:#E53935;"></i>
+                <strong id="bookingErrorTitle" style="font-size:0.95rem; font-weight:700;">Booking Submission Error</strong>
+              </div>
+              <div id="bookingErrorDetails" style="font-size:0.85rem; color:#444; line-height:1.4;"></div>
+            </div>
+
             <!-- PROGRESS STEPS INDICATOR -->
             <div class="booking-steps-indicator">
               <div class="step-badge active" id="step-badge-1"><span class="step-num">1</span> <span class="step-title">Service & Add-On</span></div>
@@ -2655,7 +2664,12 @@ html, body {
     async function handleBooking(e) {
       e.preventDefault();
       const form = document.getElementById('bookingForm');
+      const errorAlert = document.getElementById('bookingErrorAlert');
+      const errorTitle = document.getElementById('bookingErrorTitle');
+      const errorDetails = document.getElementById('bookingErrorDetails');
       
+      if (errorAlert) errorAlert.style.display = 'none';
+
       // Final validation across all steps
       if (!validateStep(1) || !validateStep(2) || !validateStep(3)) return;
       
@@ -2679,7 +2693,7 @@ html, body {
       // Show loading state
       const btn = document.getElementById('bookBtn');
       if (btn) {
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
         btn.disabled = true;
       }
 
@@ -2750,6 +2764,7 @@ html, body {
       ];
 
       let isSuccess = false;
+      let lastErrorReason = '';
 
       for (const apiUrl of endpoints) {
         try {
@@ -2762,20 +2777,41 @@ html, body {
             body: JSON.stringify(payload)
           });
           
-          const data = await response.json();
+          const data = await response.json().catch(function() { return {}; });
+
           if (response.ok && data.success) {
             isSuccess = true;
             break;
+          } else {
+            lastErrorReason = data.error || ('HTTP ' + response.status + ': Server failed to save booking to database.');
           }
         } catch (err) {
+          lastErrorReason = 'Unable to connect to backend API server at ' + apiUrl + '. Check backend status or Render deployment.';
           console.warn('Endpoint attempt failed:', apiUrl, err);
         }
       }
 
-      // Display clean success state to user (booking saved & processed)
-      form.style.display = 'none';
-      document.getElementById('bookingSuccess').style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (isSuccess) {
+        // Display success state ONLY when Django backend confirms insertion into database
+        form.style.display = 'none';
+        document.getElementById('bookingSuccess').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        // Display prominent error alert explaining EXACTLY why the booking failed to reach DB / Django Admin
+        if (errorAlert && errorDetails) {
+          if (errorTitle) errorTitle.innerText = "Database / Server Insertion Error:";
+          errorDetails.innerText = lastErrorReason || "Failed to save booking into database. Check backend deployment.";
+          errorAlert.style.display = 'block';
+          window.scrollTo({ top: errorAlert.offsetTop - 120, behavior: 'smooth' });
+        } else {
+          alert('Booking Submission Error:\n\n' + (lastErrorReason || 'Failed to save booking to database.'));
+        }
+
+        if (btn) {
+          btn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirm Reservation';
+          btn.disabled = false;
+        }
+      }
     }
 
     // Scroll-triggered sticky header
