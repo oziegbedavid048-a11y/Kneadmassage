@@ -2214,7 +2214,7 @@ html, body {
           <div class="booking-success" id="bookingSuccess" style="display:none;">
             <div class="success-icon"><i class="fas fa-circle-check"></i></div>
             <h3 class="success-title">You're All Set!</h3>
-            <p class="success-text">Your appointment request has been received and saved to our booking database. We'll send a confirmation to your email within 2 hours. We look forward to providing your wellness experience!<br><br><strong>Knead Hushed Massage — Your Wellness Journey Begins Here.</strong></p>
+            <p class="success-text">Your appointment request has been sent. We will send a confirmation to your email as soon as possible. We look forward to providing your wellness experience.<br><br><strong>Knead Hushed Massage — Your Wellness Journey Begins Here.</strong></p>
             <a href="index.html" class="btn-book" style="display:inline-block;margin-top:24px;width:auto;padding:12px 32px;text-decoration:none;">Return Home</a>
           </div>
         </div>
@@ -2904,8 +2904,8 @@ html, body {
       e.preventDefault();
       const form = document.getElementById('bookingForm');
       
-      // Final validation
-      if (!validateStep(1) || !validateStep(2)) return;
+      // Final validation across all steps
+      if (!validateStep(1) || !validateStep(2) || !validateStep(3)) return;
       
       const dateEl = document.getElementById('appointmentDate');
       const timeEl = document.getElementById('appointmentTime');
@@ -2927,7 +2927,7 @@ html, body {
       // Show loading state
       const btn = document.getElementById('bookBtn');
       if (btn) {
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
         btn.disabled = true;
       }
 
@@ -2955,52 +2955,79 @@ html, body {
         userNotes = (userNotes ? (userNotes + ' | ') : '') + '[ADD-ON REQUESTED: Happy Ending (+ $150)]';
       }
 
+      const firstName = document.getElementById('firstName')?.value || '';
+      const lastName = document.getElementById('lastName')?.value || '';
+      const email = document.getElementById('email')?.value || '';
+      const phone = document.getElementById('phone')?.value || '';
+      const zipcode = document.getElementById('zipcode')?.value || '';
+      const appointmentDate = dateEl?.value || '';
+      const appointmentTime = timeEl?.value || '';
+      const hearAbout = document.getElementById('hearAbout')?.value || '';
+
       const payload = {
-        firstName: document.getElementById('firstName')?.value || '',
-        lastName: document.getElementById('lastName')?.value || '',
-        email: document.getElementById('email')?.value || '',
-        phone: document.getElementById('phone')?.value || '',
-        zipcode: document.getElementById('zipcode')?.value || '',
+        firstName: firstName,
+        first_name: firstName,
+        lastName: lastName,
+        last_name: lastName,
+        email: email,
+        phone: phone,
+        zipcode: zipcode,
         service: serviceString,
         duration: durationVal + ' (Total Price: $' + totalAmount + ')',
-        appointmentDate: dateEl?.value || '',
-        appointmentTime: timeEl?.value || '',
-        hearAbout: document.getElementById('hearAbout')?.value || '',
+        appointmentDate: appointmentDate,
+        appointment_date: appointmentDate,
+        appointmentTime: appointmentTime,
+        appointment_time: appointmentTime,
+        hearAbout: hearAbout,
+        hear_about: hearAbout,
         notes: userNotes
       };
 
-      // API Endpoint URL (Django Backend)
-      const apiUrl = 'http://127.0.0.1:8000/api/bookings/create/';
+      // Target API Endpoints (Local & Hosted fallbacks)
+      const endpoints = [
+        'http://127.0.0.1:8000/api/bookings/create/',
+        'http://localhost:8000/api/bookings/create/',
+        '/api/bookings/create/'
+      ];
 
-      try {
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
+      let isSuccess = false;
+      let errorMsg = 'Failed to record booking. Please ensure backend server is active.';
 
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          form.style.display = 'none';
-          document.getElementById('bookingSuccess').style.display = 'block';
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-          alert(data.error || 'Failed to process booking. Please try again.');
-          if (btn) {
-            btn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirm My Appointment';
-            btn.disabled = false;
+      for (const apiUrl of endpoints) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+              isSuccess = true;
+              break;
+            } else {
+              errorMsg = data.error || errorMsg;
+            }
           }
+        } catch (err) {
+          console.warn('Endpoint failed:', apiUrl, err);
         }
-      } catch (err) {
-        console.warn('Backend API connection warning:', err);
-        // Fallback smooth success display in case backend server is starting
+      }
+
+      if (isSuccess) {
         form.style.display = 'none';
         document.getElementById('bookingSuccess').style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert(errorMsg);
+        if (btn) {
+          btn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirm Reservation';
+          btn.disabled = false;
+        }
       }
     }
 
