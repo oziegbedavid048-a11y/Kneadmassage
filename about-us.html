@@ -19,13 +19,10 @@
 <!-- FONT AWESOME 6 CDN -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style id="knead-inter-global-override">
-  html, body, p, span, a, div, li, ul, h1, h2, h3, h4, h5, h6, input, select, textarea, button, label,
-  header, header *, .knead-header-wrapper, .knead-header-wrapper *,
-  .knead-horizontal-header-wrapper, .knead-horizontal-header-wrapper *,
-  .knead-brand-logo, .knead-brand-full, .knead-brand-short,
-  .knead-main-nav, .knead-main-nav *, .knead-header-btn, .knead-header-btn *,
-  footer, footer *, .yolo-footer-wrapper, .yolo-footer-wrapper *, .booking-footer, .booking-footer *,
-  .knead-footer-bottom, .knead-footer-bottom * {
+  html, body, p, span, a, div, li, ul, h1, h2, h3, h4, h5, h6, input, select, textarea, button, label, header, footer,
+  header *, header a, .knead-brand-logo, .knead-header-btn, .navbar *, .nav *,
+  footer *, .yolo-footer-wrapper, .yolo-footer-wrapper *, .booking-footer, .booking-footer *,
+  .knead-footer-bottom, .knead-footer-bottom *, .knead-brand-logo {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   }
   i, .fa, .fas, .far, .fab, .fal, [class^="fa-"], [class*=" fa-"], .knead-brand-icon-logo i, .knead-footer-logo-icon {
@@ -35,6 +32,26 @@
   .fab, .fa-brands {
     font-family: "Font Awesome 6 Brands", "FontAwesome" !important;
     font-weight: 400 !important;
+  }
+  /* Complete brand name on mobile header */
+  .knead-brand-full {
+    display: inline !important;
+  }
+  .knead-brand-short {
+    display: none !important;
+  }
+  @media (max-width: 768px) {
+    .knead-brand-logo {
+      font-size: 1rem !important;
+      white-space: nowrap !important;
+    }
+  }
+  @media (max-width: 480px) {
+    .knead-brand-logo {
+      font-size: 0.92rem !important;
+      letter-spacing: -0.02em !important;
+      white-space: nowrap !important;
+    }
   }
 </style>
 <link rel="alternate" type="application/rss+xml" title="Knead Hushed Massage &raquo; Feed" href="../feed/" />
@@ -705,9 +722,14 @@ header.yolo-mobile-header,
 }
 </style>
 <style id="knead-brand-name-mobile-short-css">
-/* Always show complete "Knead Hushed Massage" on all screens including mobile */
-.knead-brand-short { display: none !important; }
-.knead-brand-full { display: inline !important; }
+/* On mobile show "Knead Massage" - hide "Hushed" via span */
+.knead-brand-short { display: none; }
+.knead-brand-full { display: inline; }
+
+@media (max-width: 600px) {
+  .knead-brand-short { display: inline !important; }
+  .knead-brand-full { display: none !important; }
+}
 </style>
 <style id="knead-hide-offcanvas-css">
 /* Ensure no off-canvas menu or leftover header text renders vertically after footer */
