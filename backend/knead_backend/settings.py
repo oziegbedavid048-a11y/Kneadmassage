@@ -132,3 +132,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS configuration
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+# Email Configuration (ZeptoMail / Zoho SMTP)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.zeptomail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'emailapikey')
+EMAIL_HOST_PASSWORD = os.environ.get(
+    'EMAIL_HOST_PASSWORD',
+    'wSsVR61x+kX2Bqh/ymH7cukwzQ9cBVPyFEl1i1qn4nb1FvGQ8sc8xEPLAVD0HvkbFzFhQDATrLkvyhpVhzEKiNR/w1sIDSiF9mqRe1U4J3x17qnvhDzPWWpakBGNKYgJwwhinWhnE8Ag+g=='
+)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Knead Hushed Massage <noreply@kneadhushedmassage.com>')
+SERVER_EMAIL = 'noreply@kneadhushedmassage.com'
+
