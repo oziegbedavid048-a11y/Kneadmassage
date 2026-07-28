@@ -19,9 +19,13 @@
 <!-- FONT AWESOME 6 CDN -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style id="knead-inter-global-override">
-  html, body, p, span, a, div, li, ul, h1, h2, h3, h4, h5, h6, input, select, textarea, button, label, header, footer,
-  footer *, .yolo-footer-wrapper, .yolo-footer-wrapper *, .booking-footer, .booking-footer *,
-  .knead-footer-bottom, .knead-footer-bottom *, .knead-brand-logo {
+  html, body, p, span, a, div, li, ul, h1, h2, h3, h4, h5, h6, input, select, textarea, button, label,
+  header, header *, .knead-header-wrapper, .knead-header-wrapper *,
+  .knead-horizontal-header-wrapper, .knead-horizontal-header-wrapper *,
+  .knead-brand-logo, .knead-brand-full, .knead-brand-short,
+  .knead-main-nav, .knead-main-nav *, .knead-header-btn, .knead-header-btn *,
+  footer, footer *, .yolo-footer-wrapper, .yolo-footer-wrapper *, .booking-footer, .booking-footer *,
+  .knead-footer-bottom, .knead-footer-bottom * {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   }
   i, .fa, .fas, .far, .fab, .fal, [class^="fa-"], [class*=" fa-"], .knead-brand-icon-logo i, .knead-footer-logo-icon {
@@ -530,6 +534,12 @@ textarea {
   border-color: #728247 !important;
   color: #ffffff !important;
 }
+
+<style id="knead-brand-name-mobile-short-css">
+/* Always show complete "Knead Hushed Massage" on all screens including mobile */
+.knead-brand-short { display: none !important; }
+.knead-brand-full { display: inline !important; }
+</style>
 
 @media (max-width: 1024px) {
   .knead-horizontal-header-wrapper { padding: 12px 20px !important; }

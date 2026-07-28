@@ -40,11 +40,17 @@
       --font-sans: 'Inter', sans-serif !important;
     }
 
-    html, body, p, span, a, div, li, ul, h1, h2, h3, h4, h5, h6, input, select, textarea, button, label, header, footer,
-    footer *, .booking-footer, .booking-footer *, .knead-footer-bottom, .knead-footer-bottom *,
-    .knead-brand-logo, .booking-hero-title, .booking-form-card, .btn-book, .step-badge, .step-title, .service-name {
+    html, body, p, span, a, div, li, ul, h1, h2, h3, h4, h5, h6, input, select, textarea, button, label,
+    header, header *, .knead-header-wrapper, .knead-header-wrapper *,
+    .knead-horizontal-header-wrapper, .knead-horizontal-header-wrapper *,
+    .knead-brand-logo, .knead-brand-full, .knead-brand-short,
+    .knead-main-nav, .knead-main-nav *, .knead-header-btn, .knead-header-btn *,
+    footer, footer *, .booking-footer, .booking-footer *, .knead-footer-bottom, .knead-footer-bottom *,
+    .booking-hero-title, .booking-form-card, .btn-book, .step-badge, .step-title, .service-name {
       font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     }
+    .knead-brand-short { display: none !important; }
+    .knead-brand-full { display: inline !important; }
 
     /* Restore Font Awesome icon families */
     i, .fa, .fas, .far, .fab, .fal, [class^="fa-"], [class*=" fa-"], .knead-brand-icon-logo i, .knead-footer-logo-icon {
