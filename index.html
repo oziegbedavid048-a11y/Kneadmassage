@@ -693,13 +693,22 @@ header.yolo-mobile-header,
 }
 </style>
 <style id="knead-brand-name-mobile-short-css">
-/* On mobile show "Knead Massage" - hide "Hushed" via span */
-.knead-brand-short { display: none; }
-.knead-brand-full { display: inline; }
+/* Always show complete brand name "Knead Hushed Massage" on mobile and desktop headers */
+.knead-brand-short { display: none !important; }
+.knead-brand-full { display: inline !important; }
 
-@media (max-width: 600px) {
-  .knead-brand-short { display: inline !important; }
-  .knead-brand-full { display: none !important; }
+/* Force Inter Font on all Footers */
+footer,
+footer *,
+#yolo-footer,
+#yolo-footer *,
+.elementor-location-footer,
+.elementor-location-footer *,
+.booking-footer,
+.booking-footer *,
+.knead-footer-brand,
+.knead-footer-brand * {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 </style>
 <style id="knead-hide-offcanvas-css">
