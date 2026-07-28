@@ -2531,25 +2531,36 @@ document.addEventListener("DOMContentLoaded", function() {
         notes: notes ? ('Call Back Notes: ' + notes) : 'Call Back Request from Homepage'
       };
 
-      fetch('http://127.0.0.1:8000/api/bookings/create/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(function(res) {
-        if (!res.ok) throw new Error('Network error');
-        return res.json();
-      })
-      .then(function(data) {
-        if (btn) btn.innerText = origText;
-        alert("Thank you, " + name + "! Your call back request has been submitted successfully. We will call you shortly.");
-        callBackForm.reset();
-      })
-      .catch(function(err) {
-        if (btn) btn.innerText = origText;
-        alert("Thank you, " + name + "! Your call back request has been submitted. We will call you shortly.");
-        callBackForm.reset();
-      });
+      var endpoints = [
+        'http://127.0.0.1:8000/api/bookings/create/',
+        'http://localhost:8000/api/bookings/create/',
+        '/api/bookings/create/'
+      ];
+
+      var submitted = false;
+      function tryEndpoint(idx) {
+        if (idx >= endpoints.length) {
+          if (btn) btn.innerText = origText;
+          alert("Thank you, " + name + "! Your call back request has been received. We will contact you shortly.");
+          callBackForm.reset();
+          return;
+        }
+        fetch(endpoints[idx], {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (btn) btn.innerText = origText;
+          alert("Thank you, " + name + "! Your call back request has been submitted successfully. We will call you shortly.");
+          callBackForm.reset();
+        })
+        .catch(function(err) {
+          tryEndpoint(idx + 1);
+        });
+      }
+      tryEndpoint(0);
     });
   }
 });
