@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 def _send_email_task(booking):
     """
-    Worker function executed in a background thread to send email without blocking HTTP responses.
+    Worker function executed in a background thread to send email.
+    Uses fail_silently=False so any SMTP/ZeptoMail errors are explicitly logged.
     """
     if not booking.email:
         logger.warning(f"Booking #{booking.id} has no email address.")
@@ -145,11 +146,16 @@ www.kneadhushedmassage.com
     try:
         msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
         msg.attach_alternative(html_content, "text/html")
-        msg.send(fail_silently=True)
-        logger.info(f"Confirmation email sent to {booking.email} for Booking #{booking.id}")
+        
+        # Send email with fail_silently=False so SMTP exceptions are caught & logged
+        sent_count = msg.send(fail_silently=False)
+        if sent_count > 0:
+            logger.info(f"SUCCESS: Confirmation email sent to {booking.email} for Booking #{booking.id}")
+        else:
+            logger.error(f"FAILURE: Email send returned 0 for Booking #{booking.id} ({booking.email})")
     except BaseException as e:
         logger.error(
-            f"Failed to send confirmation email to {booking.email} for Booking #{booking.id}: {type(e).__name__}: {e}",
+            f"EXCEPTIONAL FAILURE sending email to {booking.email} for Booking #{booking.id}: {type(e).__name__}: {e}",
             exc_info=True
         )
 
@@ -157,7 +163,7 @@ www.kneadhushedmassage.com
 def send_booking_confirmation_email(booking):
     """
     Launches email sending in a non-blocking background thread.
-    This guarantees Django Admin responds instantly and prevents Gunicorn worker timeout 500 errors.
+    This guarantees Django Admin responds instantly.
     """
     try:
         thread = threading.Thread(target=_send_email_task, args=(booking,), daemon=True)
