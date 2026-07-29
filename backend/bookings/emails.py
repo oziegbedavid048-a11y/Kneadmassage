@@ -1,9 +1,10 @@
 import json
 import logging
+import smtplib
 import threading
 import urllib.request
 import urllib.error
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, get_connection
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -12,15 +13,21 @@ logger = logging.getLogger(__name__)
 def _send_via_zeptomail_api(booking, subject, text_content, html_content):
     """
     Sends email directly via ZeptoMail REST API over HTTPS (Port 443).
-    Bypasses SMTP port 587/2525 blocks imposed by cloud hosts like Render.
+    Bypasses SMTP port blocks on Render completely.
     """
-    token = getattr(settings, 'EMAIL_HOST_PASSWORD', '').strip()
-    if not token:
+    raw_token = getattr(settings, 'EMAIL_HOST_PASSWORD', '').strip()
+    if not raw_token:
+        logger.error("ZeptoMail API: EMAIL_HOST_PASSWORD is empty.")
         return False
 
     url = "https://api.zeptomail.com/v1.1/email"
-    
-    # Payload as required by ZeptoMail API v1.1
+
+    # Clean token if user included prefix in environment variable
+    token = raw_token
+    for prefix in ["Zoho-enczkey ", "SendMailToken ", "zoho-enczapikey ", "Bearer "]:
+        if token.startswith(prefix):
+            token = token[len(prefix):].strip()
+
     payload = {
         "from": {
             "address": "bookings@kneadhushedmassage.com",
@@ -41,11 +48,12 @@ def _send_via_zeptomail_api(booking, subject, text_content, html_content):
 
     data = json.dumps(payload).encode('utf-8')
 
-    # Try both valid ZeptoMail Authorization header formats (zoho-enczapikey and SendMailToken)
+    # Try all standard ZeptoMail Authorization header formats
     auth_headers = [
-        f"zoho-enczapikey {token}",
+        f"Zoho-enczkey {token}",
         f"SendMailToken {token}",
-        token  # Raw token format if passed directly
+        f"zoho-enczapikey {token}",
+        token
     ]
 
     for auth_val in auth_headers:
@@ -56,15 +64,15 @@ def _send_via_zeptomail_api(booking, subject, text_content, html_content):
         }
         req = urllib.request.Request(url, data=data, headers=headers, method="POST")
         try:
-            with urllib.request.urlopen(req, timeout=12) as response:
+            with urllib.request.urlopen(req, timeout=10) as response:
                 resp_body = response.read().decode('utf-8')
-                logger.info(f"SUCCESS: Confirmation email sent via ZeptoMail HTTPS API for Booking #{booking.id}: {resp_body}")
+                logger.info(f"SUCCESS: Email sent via ZeptoMail HTTPS API for Booking #{booking.id}: {resp_body}")
                 return True
         except urllib.error.HTTPError as err:
             err_msg = err.read().decode('utf-8') if err.fp else str(err)
-            logger.warning(f"ZeptoMail HTTPS API HTTP {err.code} with header '{auth_val[:20]}...': {err_msg}")
+            logger.error(f"ZeptoMail API HTTP {err.code} (auth header '{auth_val[:18]}...'): {err_msg}")
         except BaseException as err:
-            logger.warning(f"ZeptoMail HTTPS API error with header '{auth_val[:20]}...': {err}")
+            logger.error(f"ZeptoMail API Network Error (auth header '{auth_val[:18]}...'): {err}")
 
     return False
 
@@ -72,8 +80,8 @@ def _send_via_zeptomail_api(booking, subject, text_content, html_content):
 def _send_email_task(booking):
     """
     Worker function executed in a background thread.
-    1. Tries ZeptoMail HTTPS REST API (Port 443 — 100% unblocked on Render).
-    2. Fallback to standard Django SMTP if HTTPS API does not complete.
+    1. Primary: ZeptoMail HTTPS REST API (Port 443 — unblocked).
+    2. Fallback: Dynamic SMTP with fast timeouts across Port 465 (SSL) and Port 2525 (TLS).
     """
     if not booking.email:
         logger.warning(f"Booking #{booking.id} has no email address.")
@@ -207,32 +215,45 @@ www.kneadhushedmassage.com
 </html>
 """
 
-    # Primary Attempt: HTTPS REST API (Port 443 — NEVER blocked by Render)
+    # 1. Primary Attempt: HTTPS REST API (Port 443 — NEVER blocked by Render)
     api_success = _send_via_zeptomail_api(booking, subject, text_content, html_content)
     if api_success:
         return
 
-    # Secondary Fallback Attempt: Standard Django SMTP
-    logger.info(f"HTTPS API attempt did not complete. Falling back to Django SMTP for Booking #{booking.id}...")
-    try:
-        msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
-        msg.attach_alternative(html_content, "text/html")
-        sent_count = msg.send(fail_silently=False)
-        if sent_count > 0:
-            logger.info(f"SUCCESS: Confirmation email sent via SMTP to {booking.email} for Booking #{booking.id}")
-        else:
-            logger.error(f"FAILURE: SMTP email send returned 0 for Booking #{booking.id}")
-    except BaseException as e:
-        logger.error(
-            f"EXCEPTIONAL SMTP FAILURE sending email to {booking.email} for Booking #{booking.id}: {type(e).__name__}: {e}",
-            exc_info=True
-        )
+    # 2. Secondary Fallback: SMTP with short 5s timeouts on alternative ports
+    logger.info(f"HTTPS API did not complete. Trying SMTP fallbacks for Booking #{booking.id}...")
+    
+    smtp_configs = [
+        {"port": 465, "use_ssl": True, "use_tls": False},
+        {"port": 2525, "use_ssl": False, "use_tls": True},
+        {"port": 587, "use_ssl": False, "use_tls": True},
+    ]
+
+    for cfg in smtp_configs:
+        try:
+            connection = get_connection(
+                backend='django.core.mail.backends.smtp.EmailBackend',
+                host=getattr(settings, 'EMAIL_HOST', 'smtp.zeptomail.com'),
+                port=cfg["port"],
+                username=getattr(settings, 'EMAIL_HOST_USER', 'emailapikey'),
+                password=getattr(settings, 'EMAIL_HOST_PASSWORD', ''),
+                use_tls=cfg["use_tls"],
+                use_ssl=cfg["use_ssl"],
+                timeout=5
+            )
+            msg = EmailMultiAlternatives(subject, text_content, from_email, to_email, connection=connection)
+            msg.attach_alternative(html_content, "text/html")
+            sent_count = msg.send(fail_silently=False)
+            if sent_count > 0:
+                logger.info(f"SUCCESS: Email sent via SMTP (Port {cfg['port']}) for Booking #{booking.id}")
+                return
+        except BaseException as err:
+            logger.error(f"SMTP Port {cfg['port']} failed for Booking #{booking.id}: {type(err).__name__}: {err}")
 
 
 def send_booking_confirmation_email(booking):
     """
     Launches email sending in a non-blocking background thread.
-    This guarantees Django Admin responds instantly.
     """
     try:
         thread = threading.Thread(target=_send_email_task, args=(booking,), daemon=True)
