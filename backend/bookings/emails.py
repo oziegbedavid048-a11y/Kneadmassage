@@ -150,5 +150,8 @@ www.kneadhushedmassage.com
         logger.info(f"Confirmation email sent to {booking.email} for Booking #{booking.id}")
         return True
     except Exception as e:
-        logger.error(f"Failed to send confirmation email to {booking.email}: {e}")
+        logger.error(
+            f"Failed to send confirmation email to {booking.email} for Booking #{booking.id}: {type(e).__name__}: {e}",
+            exc_info=True
+        )
         return False

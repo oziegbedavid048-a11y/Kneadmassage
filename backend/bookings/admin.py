@@ -1,6 +1,9 @@
+import logging
 from django.contrib import admin, messages
 from .models import Booking
 from .emails import send_booking_confirmation_email
+
+logger = logging.getLogger(__name__)
 
 
 @admin.register(Booking)
@@ -17,9 +20,9 @@ class BookingAdmin(admin.ModelAdmin):
         'status',
         'created_at',
     )
-    
+
     list_display_links = ('id', 'full_name_display')
-    
+
     # Enable direct editing of status from the admin table view
     list_editable = ('status',)
 
@@ -52,53 +55,91 @@ class BookingAdmin(admin.ModelAdmin):
     def full_name_display(self, obj):
         return f"{obj.first_name} {obj.last_name}"
 
+    def _try_send_confirmation_email(self, request, booking):
+        """
+        Safely attempt to send a confirmation email.
+        Never raises — logs errors and shows admin messages instead.
+        """
+        try:
+            sent = send_booking_confirmation_email(booking)
+            if sent:
+                self.message_user(
+                    request,
+                    f"✅ Confirmation email sent to {booking.email} for Booking #{booking.id}.",
+                    messages.SUCCESS
+                )
+            else:
+                self.message_user(
+                    request,
+                    f"⚠️ Booking #{booking.id} confirmed, but the email to {booking.email} could not be sent. Check your ZeptoMail settings.",
+                    messages.WARNING
+                )
+        except Exception as exc:
+            logger.error(f"Email send failed for Booking #{booking.id}: {exc}", exc_info=True)
+            self.message_user(
+                request,
+                f"⚠️ Booking #{booking.id} status saved as Confirmed, but email failed: {exc}. Check Render logs and ZeptoMail credentials.",
+                messages.WARNING
+            )
+
     def save_model(self, request, obj, form, change):
+        """
+        Detect when status changes to Confirmed on the detail page and send email.
+        Errors in email sending are caught and shown as admin warnings — never 500.
+        """
         old_status = None
         if change and obj.pk:
-            old_obj = Booking.objects.filter(pk=obj.pk).first()
-            if old_obj:
-                old_status = old_obj.status
+            try:
+                old_obj = Booking.objects.filter(pk=obj.pk).first()
+                if old_obj:
+                    old_status = old_obj.status
+            except Exception:
+                pass
 
         super().save_model(request, obj, form, change)
 
-        # If status changed to Confirmed, send confirmation email
+        # Send confirmation email only if status just changed TO Confirmed
         if obj.status == 'Confirmed' and old_status != 'Confirmed':
-            sent = send_booking_confirmation_email(obj)
-            if sent:
-                self.message_user(request, f"Confirmation email sent to {obj.email} for Booking #{obj.id}.", messages.SUCCESS)
-            else:
-                self.message_user(request, f"Booking #{obj.id} confirmed, but failed to send email to {obj.email}. Check logs.", messages.WARNING)
+            self._try_send_confirmation_email(request, obj)
 
     def save_formset(self, request, form, formset, change):
+        """
+        Handle inline list-editable saves (status changed from the changelist table).
+        Detect Confirmed transitions and send emails safely.
+        """
+        # Capture old statuses before saving
+        old_statuses = {}
+        for form_instance in formset.forms:
+            obj = form_instance.instance
+            if obj.pk:
+                try:
+                    old_obj = Booking.objects.filter(pk=obj.pk).first()
+                    if old_obj:
+                        old_statuses[obj.pk] = old_obj.status
+                except Exception:
+                    pass
+
         instances = formset.save(commit=False)
         for instance in instances:
-            old_status = None
-            if instance.pk:
-                old_obj = Booking.objects.filter(pk=instance.pk).first()
-                if old_obj:
-                    old_status = old_obj.status
             instance.save()
+            old_status = old_statuses.get(instance.pk)
             if instance.status == 'Confirmed' and old_status != 'Confirmed':
-                sent = send_booking_confirmation_email(instance)
-                if sent:
-                    self.message_user(request, f"Confirmation email sent to {instance.email} for Booking #{instance.id}.", messages.SUCCESS)
-                else:
-                    self.message_user(request, f"Booking #{instance.id} confirmed, but email sending failed.", messages.WARNING)
+                self._try_send_confirmation_email(request, instance)
         formset.save_m2m()
 
-    @admin.action(description='Mark selected bookings as Confirmed & Send Email')
+    @admin.action(description='✅ Mark selected as Confirmed & Send Confirmation Email')
     def mark_confirmed(self, request, queryset):
         count = 0
-        email_count = 0
         for booking in queryset:
             if booking.status != 'Confirmed':
                 booking.status = 'Confirmed'
                 booking.save()
                 count += 1
-                sent = send_booking_confirmation_email(booking)
-                if sent:
-                    email_count += 1
-        self.message_user(request, f"Marked {count} booking(s) as Confirmed. {email_count} confirmation email(s) sent successfully.", messages.SUCCESS)
+                self._try_send_confirmation_email(request, booking)
+        if count == 0:
+            self.message_user(request, "All selected bookings were already Confirmed.", messages.WARNING)
+        else:
+            self.message_user(request, f"Marked {count} booking(s) as Confirmed.", messages.SUCCESS)
 
     @admin.action(description='Mark selected bookings as Completed')
     def mark_completed(self, request, queryset):

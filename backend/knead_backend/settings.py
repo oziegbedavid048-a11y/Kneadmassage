@@ -133,11 +133,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-# Email Configuration (ZeptoMail / Zoho SMTP)
+# Email Configuration (ZeptoMail SMTP)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.zeptomail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False  # Must be False when USE_TLS=True (port 587 uses STARTTLS)
+EMAIL_TIMEOUT = 30    # Prevent hanging on Render — fail after 30s instead of never
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'emailapikey')
 EMAIL_HOST_PASSWORD = os.environ.get(
     'EMAIL_HOST_PASSWORD',
