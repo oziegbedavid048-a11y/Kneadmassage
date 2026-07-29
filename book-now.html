@@ -3026,11 +3026,9 @@ html, body {
         localStorage.setItem('knead_bookings', JSON.stringify(existingBookings));
       } catch (e) {}
 
-      // Target API Endpoints (Local & Hosted fallbacks)
+      // Live Backend API Endpoint (Render deployment)
       const endpoints = [
-        'http://127.0.0.1:8000/api/bookings/create/',
-        'http://localhost:8000/api/bookings/create/',
-        '/api/bookings/create/'
+        'https://kneadmassage.onrender.com/api/bookings/create/'
       ];
 
       let isSuccess = false;
