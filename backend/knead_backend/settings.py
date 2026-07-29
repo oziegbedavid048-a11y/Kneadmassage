@@ -137,9 +137,10 @@ CORS_ALLOW_CREDENTIALS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.zeptomail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False  # Must be False when USE_TLS=True (port 587 uses STARTTLS)
-EMAIL_TIMEOUT = 30    # Prevent hanging on Render — fail after 30s instead of never
+# Support Port 465 (SSL) vs Port 587/2525 (TLS)
+EMAIL_USE_SSL = (EMAIL_PORT == 465)
+EMAIL_USE_TLS = (EMAIL_PORT != 465)
+EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', 10))    # 10s timeout max
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'emailapikey')
 EMAIL_HOST_PASSWORD = os.environ.get(
     'EMAIL_HOST_PASSWORD',

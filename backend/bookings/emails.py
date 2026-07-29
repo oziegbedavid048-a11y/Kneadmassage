@@ -1,23 +1,23 @@
 import logging
+import threading
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 
-def send_booking_confirmation_email(booking):
+def _send_email_task(booking):
     """
-    Sends a clean, professional booking confirmation email to the user when their appointment is approved.
+    Worker function executed in a background thread to send email without blocking HTTP responses.
     """
     if not booking.email:
         logger.warning(f"Booking #{booking.id} has no email address.")
-        return False
+        return
 
     subject = f"Booking Confirmed — Knead Hushed Massage (Appointment #{booking.id})"
     from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'Knead Hushed Massage <bookings@kneadhushedmassage.com>')
     to_email = [booking.email]
 
-    # Plain text fallback
     text_content = f"""Dear {booking.first_name},
 
 Great news! Your booking with Knead Hushed Massage has been officially approved and confirmed.
@@ -42,7 +42,6 @@ Knead Hushed Massage Team
 www.kneadhushedmassage.com
 """
 
-    # Simple, minimal HTML template (no complex layout, clean & elegant)
     html_content = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -146,12 +145,24 @@ www.kneadhushedmassage.com
     try:
         msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
         msg.attach_alternative(html_content, "text/html")
-        msg.send(fail_silently=False)
+        msg.send(fail_silently=True)
         logger.info(f"Confirmation email sent to {booking.email} for Booking #{booking.id}")
-        return True
-    except Exception as e:
+    except BaseException as e:
         logger.error(
             f"Failed to send confirmation email to {booking.email} for Booking #{booking.id}: {type(e).__name__}: {e}",
             exc_info=True
         )
+
+
+def send_booking_confirmation_email(booking):
+    """
+    Launches email sending in a non-blocking background thread.
+    This guarantees Django Admin responds instantly and prevents Gunicorn worker timeout 500 errors.
+    """
+    try:
+        thread = threading.Thread(target=_send_email_task, args=(booking,), daemon=True)
+        thread.start()
+        return True
+    except BaseException as e:
+        logger.error(f"Error starting email thread for Booking #{booking.id}: {e}")
         return False
