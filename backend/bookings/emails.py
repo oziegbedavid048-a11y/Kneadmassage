@@ -1,15 +1,79 @@
+import json
 import logging
 import threading
+import urllib.request
+import urllib.error
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 
+def _send_via_zeptomail_api(booking, subject, text_content, html_content):
+    """
+    Sends email directly via ZeptoMail REST API over HTTPS (Port 443).
+    Bypasses SMTP port 587/2525 blocks imposed by cloud hosts like Render.
+    """
+    token = getattr(settings, 'EMAIL_HOST_PASSWORD', '').strip()
+    if not token:
+        return False
+
+    url = "https://api.zeptomail.com/v1.1/email"
+    
+    # Payload as required by ZeptoMail API v1.1
+    payload = {
+        "from": {
+            "address": "bookings@kneadhushedmassage.com",
+            "name": "Knead Hushed Massage"
+        },
+        "to": [
+            {
+                "email_address": {
+                    "address": booking.email,
+                    "name": booking.first_name or "Valued Customer"
+                }
+            }
+        ],
+        "subject": subject,
+        "htmlbody": html_content,
+        "textbody": text_content
+    }
+
+    data = json.dumps(payload).encode('utf-8')
+
+    # Try both valid ZeptoMail Authorization header formats (zoho-enczapikey and SendMailToken)
+    auth_headers = [
+        f"zoho-enczapikey {token}",
+        f"SendMailToken {token}",
+        token  # Raw token format if passed directly
+    ]
+
+    for auth_val in auth_headers:
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": auth_val
+        }
+        req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=12) as response:
+                resp_body = response.read().decode('utf-8')
+                logger.info(f"SUCCESS: Confirmation email sent via ZeptoMail HTTPS API for Booking #{booking.id}: {resp_body}")
+                return True
+        except urllib.error.HTTPError as err:
+            err_msg = err.read().decode('utf-8') if err.fp else str(err)
+            logger.warning(f"ZeptoMail HTTPS API HTTP {err.code} with header '{auth_val[:20]}...': {err_msg}")
+        except BaseException as err:
+            logger.warning(f"ZeptoMail HTTPS API error with header '{auth_val[:20]}...': {err}")
+
+    return False
+
+
 def _send_email_task(booking):
     """
-    Worker function executed in a background thread to send email.
-    Uses fail_silently=False so any SMTP/ZeptoMail errors are explicitly logged.
+    Worker function executed in a background thread.
+    1. Tries ZeptoMail HTTPS REST API (Port 443 — 100% unblocked on Render).
+    2. Fallback to standard Django SMTP if HTTPS API does not complete.
     """
     if not booking.email:
         logger.warning(f"Booking #{booking.id} has no email address.")
@@ -143,19 +207,24 @@ www.kneadhushedmassage.com
 </html>
 """
 
+    # Primary Attempt: HTTPS REST API (Port 443 — NEVER blocked by Render)
+    api_success = _send_via_zeptomail_api(booking, subject, text_content, html_content)
+    if api_success:
+        return
+
+    # Secondary Fallback Attempt: Standard Django SMTP
+    logger.info(f"HTTPS API attempt did not complete. Falling back to Django SMTP for Booking #{booking.id}...")
     try:
         msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
         msg.attach_alternative(html_content, "text/html")
-        
-        # Send email with fail_silently=False so SMTP exceptions are caught & logged
         sent_count = msg.send(fail_silently=False)
         if sent_count > 0:
-            logger.info(f"SUCCESS: Confirmation email sent to {booking.email} for Booking #{booking.id}")
+            logger.info(f"SUCCESS: Confirmation email sent via SMTP to {booking.email} for Booking #{booking.id}")
         else:
-            logger.error(f"FAILURE: Email send returned 0 for Booking #{booking.id} ({booking.email})")
+            logger.error(f"FAILURE: SMTP email send returned 0 for Booking #{booking.id}")
     except BaseException as e:
         logger.error(
-            f"EXCEPTIONAL FAILURE sending email to {booking.email} for Booking #{booking.id}: {type(e).__name__}: {e}",
+            f"EXCEPTIONAL SMTP FAILURE sending email to {booking.email} for Booking #{booking.id}: {type(e).__name__}: {e}",
             exc_info=True
         )
 
